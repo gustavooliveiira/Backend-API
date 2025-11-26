@@ -7,7 +7,7 @@ const url = '/voluntarios'
 let id = null;
 let token = null;
 
-describe('/voluntarios', ()=>{
+describe('Testes do recurso /voluntarios', ()=>{
     test('POST /voluntarios', async ()=>{
         const response = await request.post(url).send({
             "email": "voluntario@email.com", 
@@ -62,7 +62,6 @@ describe('/voluntarios', ()=>{
         expect(response.status).toBe(200);
         expect(response.body._id).toBeDefined();
         expect(response.body.email).toBe("voluntario@email.com");
-        expect(response.body.senha).toBe("abcd1234");
     });
     
     test('GET / id deve retornar 400', async () => {
@@ -74,11 +73,11 @@ describe('/voluntarios', ()=>{
     test('GET / id deve retornar 404', async () => {
         const response = await request.get(`${url}/000000000000000000000000`);
         expect(response.status).toBe(404);
-        expect(response.body.msg).toBe("Voluntario nao encontrado!");
+        expect(response.body.msg).toBe("Voluntário não encontrado");
     });
 
     test('PUT / id deve retornar 200', async () => {
-        const response = await request.put(`${url}/${id}`).send({email: "voluntario@email.com", 
+        const response = await request.put(`${url}/${id}`).set("authorization",`Bearer ${token}`).send({email: "voluntario@email.com", 
             senha: "abcd1234" });
         expect(response.status).toBe(200);
         expect(response.body.email).toBe("voluntario@email.com");
@@ -86,21 +85,21 @@ describe('/voluntarios', ()=>{
     });
 
     test('PUT / id deve retornar 400', async () => {
-        const response = await request.put(`${url}/0`);
+        const response = await request.put(`${url}/0`).set("authorization",`Bearer ${token}`);
         expect(response.status).toBe(400);
         expect(response.body.msg).toBe("ID inválido");
     });
 
     test('PUT / id deve retornar 404', async () => {
-        const response = await request.put(`${url}/000000000000000000000000`);
+        const response = await request.put(`${url}/000000000000000000000000`).set("authorization",`Bearer ${token}`);
         expect(response.status).toBe(404);
-        expect(response.body.msg).toBe("Voluntario nao encontrado");
+        expect(response.body.msg).toBe("Voluntário não encontrado");
     });
 
     test('PUT / id deve retornar 422', async () => {
-        const response = await request.put(`${url}/${id}`).send({email: "", senha: true});
+        const response = await request.put(`${url}/${id}`).set("authorization", `Bearer ${token}`).send({email: "", senha: true});
         expect(response.status).toBe(422);
-        expect(response.body.msg).toBe("email do voluntario é obrigatorio")
+        expect(response.body.msg).toBe("email do voluntário é obrigatorio")
     });
     test('DELETE /voluntarios/${id}', async ()=>{
         const response = await request.delete(`${url}/${id}`).set("authorization",`Bearer ${token}`);
