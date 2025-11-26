@@ -4,6 +4,8 @@ const { verificarToken } = require('../middlewares/authMiddlewares.js');
 
 const router = express.Router();
 
+router.get('/', voluntariosController.criar);
+
 router.post('/', voluntariosController.criar);
 
 router.post('/login', voluntariosController.entrar);

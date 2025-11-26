@@ -24,9 +24,9 @@ describe('/voluntarios', ()=>{
         expect(response.status).toBe(422);
         expect(response.body.msg).toMatch('Email e Senha são obrigatórios');
     });
-    test('POST /voluntarios/login', async ()=>{
+    test('POST /voluntarios/login espera 200', async ()=>{
         const response = await request.post(`${url}/login`).send({
-             "voluntario": "voluntario@email.com", 
+             "email": "voluntario@email.com", 
              "senha": "abcd1234"
         })
         expect(response.status).toBe(200);
@@ -34,19 +34,19 @@ describe('/voluntarios', ()=>{
         expect(response.body.token).toBeDefined();
         token = response.body.token;
     });
-    test('POST /voluntarios/login', async ()=>{
+    test('POST /voluntarios/login espera 401', async ()=>{
         const response = await request.post(`${url}/login`).send({})
         expect(response.status).toBe(401);
         expect(response.body.msg).toMatch('Credenciais inválidas');
     });
-    test('POST /voluntarios/renovar', async ()=>{
+    test('POST /voluntarios/renovar espera 200', async ()=>{
         const response = await request.post(`${url}/renovar`).set("authorization",`Bearer ${token}`);
         expect(response.status).toBe(200);
         expect(response.headers['content-type']).toMatch(/json/);
         expect(response.body.token).toBeDefined();
         token = response.body.token;
     });
-    test('POST /voluntarios/renovar', async ()=>{
+    test('POST /voluntarios/renovar espera 401', async ()=>{
         const response = await request.post(`${url}/renovar`).set("authorization",`Bearer 123456789`);
         expect(response.status).toBe(401);
         expect(response.body.msg).toMatch('Token inválido');

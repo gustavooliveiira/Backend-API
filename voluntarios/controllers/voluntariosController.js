@@ -15,11 +15,11 @@ async function criar(req,res){
 }
 
 async function entrar(req,res){
-    const voluntarioEncontrado = await voluntariosModel.findOne({email:req.body.voluntarios});
+    const voluntarioEncontrado = await voluntariosModel.findOne({email:req.body.email});
     if(voluntarioEncontrado){
         const confere = compararSenha(req.body.senha,voluntarioEncontrado.senha);
         if(confere){
-            const token = gerarToken({email:req.body.voluntarios});
+            const token = gerarToken({email:req.body.email});
             return res.status(200).json({token: token});
         }else{
             return res.status(401).json({msg:'Credenciais inválidas'})
@@ -29,9 +29,9 @@ async function entrar(req,res){
     }
 }
 
-async function renovar(req,res){
-    const token = gerarToken({email:req.voluntarios});
-    return res.status(200).json({token: token});
+async function renovar(req, res) {
+    const novoToken = gerarToken({ email: req.usuario.email });
+    return res.status(200).json({ token: novoToken });
 }
 
 async function remover(req,res){
