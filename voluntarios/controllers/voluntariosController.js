@@ -30,7 +30,6 @@ async function buscar(req, res, next) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ msg: "ID inválido" });
   }
-
   const voluntarioEncontrado = await Voluntario.findOne({ _id: id });
   if (voluntarioEncontrado) {
     req.voluntarios = voluntarioEncontrado;

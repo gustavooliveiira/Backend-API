@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API REST
-  version: 0.1
+  version: 0.2
 servers:
   - url: http://localhost:3000/
 tags:
@@ -9,29 +9,217 @@ tags:
 paths:
   /voluntarios:
     get:
-      summary: Lista todos os voluntarios
+      summary: Lista todos os voluntários
       tags:
         - voluntarios
       responses:
         200:
+          description: Uma lista de voluntarios
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfVoluntarios'                  
         500:
+          description: Erro interno na API
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Erro500'
     post:
+      security:
+        - JWTAuth: []
+      summary: Cria um JSON com os dados do voluntario
       tags:
         - voluntarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Voluntario'
+      responses:
+        201:
+          description: Produto criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voluntario'
+        422:
+          description: Email do voluntário é obrigatorio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro422'
+        500:
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+  /voluntarios/{voluntarioId}:
+    get:
+      summary: Lista um voluntário pelo id
+      tags:
+        - voluntarios
+      parameters:
+        - in: path
+          name: voluntarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Um JSON com os dados do voluntário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voluntario'
+        400:  
+          description: Id do voluntário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: Voluntário não encontrado        
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        500:
+          description: Erro interno na API        
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
     put:
+      security:
+        - JWTAuth: []
+      summary: Atualiza os dados de um voluntário
       tags:
         - voluntarios
+      parameters:
+        - in: path
+          name: voluntarioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                concluida:
+                  type: boolean  
+      responses:
+        200:
+          description: Um JSON com os dados do voluntário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voluntario'
+        400:
+          description: Id do voluntário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: Voluntário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        422:
+          description: Email do voluntário é obrigatorio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro422'
+        500:        
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
     delete:
+      security:
+        - JWTAuth: []
+      summary: Remove um voluntário
       tags:
         - voluntarios
+      parameters:
+        - in: path
+          name: voluntarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Voluntário removido com sucesso
+          content:
+        400:  
+          description: Id do voluntário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: Voluntário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        500:
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
 components:
   schemas:
+    Voluntario:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+        senha:
+    ArrayOfVoluntarios:
+      type: array
+      items:
+        $ref: '#/components/schemas/Voluntario'
+    Erro400:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Id inválido"
+    Erro404:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Voluntário não encontrado"
+    Erro422:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Email do voluntário é obrigatorio"
+    Erro500:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Erro interno na API"
   securitySchemes:
+  JWTAuth:
+    type: http
+    scheme: bearer
+    in: header
+    name: Authorization
