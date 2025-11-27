@@ -1,49 +1,29 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
-function validarToken(req, res, next) {
-  const authHeader = req.headers.authorization || req.headers.Authorization;
-  if (!authHeader) return res.status(401).json({ msg: "Token ausente" });
+function verificarToken(req, res, next) {
   try {
-    let payload = null;
-    if (authHeader.includes("Bearer ")) {
-      const token = authHeader.split(" ")[1];
-      payload = jwt.verify(token, process.env.JWT_SEGREDO);
+    const token = req.headers.authorization;
+    if (token) {
+      const tokenPuro = token.split(" ")[1];
+      req.usuario = jwt.verify(tokenPuro, process.env.JWT_SECRET);
+      return next();
     } else {
-      payload = jwt.verify(authHeader, process.env.JWT_SEGREDO);
+      return res.status(401).json({ msg: "Token inválido" });
     }
-    req.payload = {
-      iss: payload.iss,
-      aud: payload.aud,
-      email: payload.email,
-      nome: payload.nome,
-    };
-    next();
   } catch (err) {
-    res.status(401).json({ msg: "Token inválido " });
+    return res.status(401).json({ msg: "Token inválido" });
   }
 }
 
 function gerarToken(payload) {
   try {
-    const expiresIn = "30m";
-    const token = jwt.sign(payload, process.env.JWT_SEGREDO, { expiresIn });
-    return token;
+    const expiresIn = process.env.JWT_EXPIRES;
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+    return { token };
   } catch (err) {
     throw Error("Erro ao gerar token");
   }
 }
 
-function renovarToken(req, res) {
-  try {
-    const payload = req.payload;
-    res.json({ token: gerarToken(payload) });
-  } catch (err) {
-    return res.status(500).json({ msg: "Erro ao renovar token" });
-  }
-}
-
-module.exports = {
-  validarToken,
-  gerarToken,
-  renovarToken,
-};
+module.exports = { verificarToken, gerarToken };
