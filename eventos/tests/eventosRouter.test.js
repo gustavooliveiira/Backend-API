@@ -83,7 +83,7 @@ test('POST /eventos', async ()=> {
             data: "26/11/2025" });
         expect(response.status).toBe(200);
         expect(response.body.nome).toBe("churrasquinho");
-        expect(response.body.data).toBe("26/11/2025")
+        expect(new Date(response.body.data).toISOString().startsWith("2025-11-26")).toBe(true);
     });
 
     test('PUT / id deve retornar 400', async () => {
