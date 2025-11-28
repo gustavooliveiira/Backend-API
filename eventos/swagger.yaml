@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Eventos",
+    "version": "1.0.0",
+    "description": "Documentação da API de Eventos com autenticação JWT"
+  },
+
+  "paths": {
+    "/eventos": {
+      "get": {
+        "summary": "Listar todos os eventos",
+        "tags": ["Eventos"],
+        "responses": {
+          "200": {
+            "description": "Lista de eventos retornada com sucesso"
+          }
+        }
+      },
+
+      "post": {
+        "summary": "Criar um novo evento",
+        "tags": ["Eventos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventoCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Evento criado com sucesso" },
+          "422": { "description": "Dados inválidos" }
+        }
+      }
+    },
+
+    "/eventos/login": {
+      "post": {
+        "summary": "Login do evento",
+        "tags": ["Autenticação"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login bem-sucedido" },
+          "401": { "description": "Credenciais inválidas" }
+        }
+      }
+    },
+
+    "/eventos/renovar": {
+      "post": {
+        "summary": "Renovar token JWT",
+        "tags": ["Autenticação"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Token renovado" },
+          "401": { "description": "Token inválido" }
+        }
+      }
+    },
+
+    "/eventos/{id}": {
+      "get": {
+        "summary": "Buscar evento por ID",
+        "tags": ["Eventos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Evento retornado com sucesso" },
+          "404": { "description": "Evento não encontrado" },
+          "400": { "description": "ID inválido" }
+        }
+      },
+
+      "put": {
+        "summary": "Atualizar evento",
+        "tags": ["Eventos"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EventoCreate" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Evento atualizado" },
+          "422": { "description": "Dados inválidos" },
+          "404": { "description": "Evento não encontrado" }
+        }
+      },
+
+      "delete": {
+        "summary": "Remover evento",
+        "tags": ["Eventos"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Evento removido" },
+          "404": { "description": "Evento não encontrado" }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "Evento": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "nome": { "type": "string" },
+          "data": { "type": "string", "format": "date" },
+          "local": { "type": "string" },
+          "descricao": { "type": "string" },
+          "limite_voluntarios": { "type": "number" },
+          "voluntarios": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+
+      "EventoCreate": {
+        "type": "object",
+        "required": ["nome", "data"],
+        "properties": {
+          "nome": { "type": "string", "example": "Churrasco" },
+          "data": { "type": "string", "example": "26/11/2025" }
+        }
+      },
+
+      "Login": {
+        "type": "object",
+        "required": ["nome", "data"],
+        "properties": {
+          "nome": { "type": "string", "example": "Churrasco" },
+          "data": { "type": "string", "example": "26/11/2025" }
+        }
+      }
+    },
+
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
