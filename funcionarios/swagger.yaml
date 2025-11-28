@@ -1,0 +1,225 @@
+openapi: 3.0.0
+info:
+  title: API REST
+  version: 0.2
+servers:
+  - url: http://localhost:3000/
+tags:
+  - name: funcionario
+paths:
+  /funcionarios:
+    get:
+      summary: Lista todos os funcionários
+      tags:
+        - funcionarios
+      responses:
+        200:
+          description: Uma lista de funcionarios
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfFuncionarios'                  
+        500:
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+    post:
+      security:
+        - JWTAuth: []
+      summary: Cria um JSON com os dados do funcionario
+      tags:
+        - funcionarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Funcionario'
+      responses:
+        201:
+          description: Produto criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        422:
+          description: Email do funcionário é obrigatorio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro422'
+        500:
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+  /funcionarios/{funcionarioId}:
+    get:
+      summary: Lista um funcionário pelo id
+      tags:
+        - funcionarios
+      parameters:
+        - in: path
+          name: funcionarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Um JSON com os dados do funcionário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        400:  
+          description: Id do funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: funcionário não encontrado        
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        500:
+          description: Erro interno na API        
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+    put:
+      security:
+        - JWTAuth: []
+      summary: Atualiza os dados de um funcionário
+      tags:
+        - funcionarios
+      parameters:
+        - in: path
+          name: funcionarioId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                concluida:
+                  type: boolean  
+      responses:
+        200:
+          description: Um JSON com os dados do funcionário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        400:
+          description: Id do funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        422:
+          description: Email do funcionário é obrigatorio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro422'
+        500:        
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+    delete:
+      security:
+        - JWTAuth: []
+      summary: Remove um funcionário
+      tags:
+        - funcionarios
+      parameters:
+        - in: path
+          name: funcionarioId
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: funcionário removido com sucesso
+          content:
+        400:  
+          description: Id do funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro400'
+        404:
+          description: funcionário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro404'
+        500:
+          description: Erro interno na API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro500'
+components:
+  schemas:
+    Funcionario:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+        senha:
+    ArrayOfFuncionarios:
+      type: array
+      items:
+        $ref: '#/components/schemas/Funcionario'
+    Erro400:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Id inválido"
+    Erro404:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "funcionário não encontrado"
+    Erro422:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Email do funcionário é obrigatorio"
+    Erro500:
+      type: object
+      properties:
+        msg:
+          type: string
+          example: "Erro interno na API"
+  securitySchemes:
+  JWTAuth:
+    type: http
+    scheme: bearer
+    in: header
+    name: Authorization
